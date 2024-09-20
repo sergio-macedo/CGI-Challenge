@@ -8,12 +8,20 @@ resource "aws_security_group" "allow_ssh" {
   description = "Allow SSH and other necessary ports"
   vpc_id      = aws_vpc.cgi_vpc.id
 
-  ingress = {
-    from port = 80
-    to port = 80
-    protocol = "tcp"
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  ingress {
+    from_port   = 30080
+    to_port     = 30080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 
 
   ingress {
@@ -46,27 +54,34 @@ resource "aws_instance" "cgi_kind_instance" {
   security_groups = [aws_security_group.allow_ssh.id]
   key_name        = aws_key_pair.cgi_kind_key.key_name
 
-  # Install Docker and KinD via user_data
   user_data = <<-EOF
               #!/bin/bash
+              # Update packages and install docker
               sudo yum update -y
-              sudo yum install docker -y
+              sudo yum install -y docker
               sudo service docker start
               sudo usermod -aG docker ec2-user
-              curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
-              chmod +x ./kind
-              sudo mv ./kind /usr/local/bin/kind
-              curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-              chmod +x ./kubectl
-              sudo mv ./kubectl /usr/local/bin/kubectl
-              kind create cluster --wait 5s
+
+              # Install AWS CLI to authenticate with ECR
+              sudo yum install -y aws-cli
+
+              # Authenticate Docker with ECR
+              $(aws ecr get-login-password --region "eu-central-1" | docker login --username AWS --password-stdin ${aws_ecr_repository.kind_nginx_kubectl_repo.repository_url})
+
+              # Pull the Docker image from ECR
+              docker pull ${aws_ecr_repository.kind_nginx_kubectl_repo.repository_url}:latest
+
+              # Run the Docker container (expose Nginx on port 80)
+              docker run -d -p 80:80 ${aws_ecr_repository.kind_nginx_kubectl_repo.repository_url}:latest
               EOF
+
+
 
   tags = {
     Name = "KinD-EC2"
   }
-}
 
+}
 # Output the instance public IP
 output "instance_public_ip" {
   value = aws_instance.cgi_kind_instance.public_ip
