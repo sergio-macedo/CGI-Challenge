@@ -6,7 +6,7 @@ resource "aws_key_pair" "cgi_kind_key" {
 resource "aws_security_group" "allow_ssh" {
   name        = "allow_ssh"
   description = "Allow SSH and other necessary ports"
-  vpc_id = aws_vpc.cgi_vpc.id
+  vpc_id      = aws_vpc.cgi_vpc.id
 
   ingress {
     from_port   = 22
@@ -32,7 +32,7 @@ resource "aws_security_group" "allow_ssh" {
 
 
 resource "aws_instance" "cgi_kind_instance" {
-  subnet_id = aws_subnet.CGI_challenge_pub_subnet.id
+  subnet_id       = aws_subnet.CGI_challenge_pub_subnet.id
   ami             = "ami-0df0e7600ad0913a9"
   instance_type   = "t2.micro"
   security_groups = [aws_security_group.allow_ssh.id]
@@ -48,6 +48,10 @@ resource "aws_instance" "cgi_kind_instance" {
               curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
               chmod +x ./kind
               sudo mv ./kind /usr/local/bin/kind
+              curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+              chmod +x ./kubectl
+              sudo mv ./kubectl /usr/local/bin/kubectl
+              kind create cluster --wait 5s
               EOF
 
   tags = {
