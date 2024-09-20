@@ -1,12 +1,20 @@
 resource "aws_key_pair" "cgi_kind_key" {
-  key_name   = "terraform-key"
-  public_key = file("~/.ssh/id_rsa.pub")
+  key_name   = "cgi-kind-key"
+  public_key = var.ssh_public_key
 }
 
 resource "aws_security_group" "allow_ssh" {
   name        = "allow_ssh"
   description = "Allow SSH and other necessary ports"
   vpc_id      = aws_vpc.cgi_vpc.id
+
+  ingress = {
+    from port = 80
+    to port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 
   ingress {
     from_port   = 22
