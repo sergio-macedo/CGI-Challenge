@@ -24,7 +24,8 @@ jobs:
           terraform --version
 
       - name: set up my terraform 
-        run: make terraform
+        run: terraform apply
+            
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
