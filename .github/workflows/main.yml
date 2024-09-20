@@ -24,7 +24,9 @@ jobs:
           terraform --version
 
       - name: set up my terraform 
-        run: terraform apply
+        run: |
+            terraform init
+            terraform apply
             
 
       - name: Set up Docker Buildx
