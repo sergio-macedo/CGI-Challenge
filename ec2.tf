@@ -48,11 +48,13 @@ resource "aws_security_group" "allow_ssh" {
 
 
 resource "aws_instance" "cgi_kind_instance" {
-  subnet_id       = aws_subnet.CGI_challenge_pub_subnet.id
-  ami             = "ami-0df0e7600ad0913a9"
-  instance_type   = "t2.micro"
-  security_groups = [aws_security_group.allow_ssh.id]
-  key_name        = aws_key_pair.cgi_kind_key.key_name
+  subnet_id            = aws_subnet.CGI_challenge_pub_subnet.id
+  ami                  = "ami-0df0e7600ad0913a9"
+  instance_type        = "t2.micro"
+  security_groups      = [aws_security_group.allow_ssh.id]
+  key_name             = aws_key_pair.cgi_kind_key.key_name
+  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
+
 
   user_data = <<-EOF
               #!/bin/bash
@@ -65,14 +67,10 @@ resource "aws_instance" "cgi_kind_instance" {
               # Install AWS CLI to authenticate with ECR
               sudo yum install -y aws-cli
 
-              # Authenticate Docker with ECR
-              $(aws ecr get-login-password --region "eu-central-1" | docker login --username AWS --password-stdin ${aws_ecr_repository.kind_nginx_kubectl_repo.repository_url})
-
-              # Pull the Docker image from ECR
-              docker pull ${aws_ecr_repository.kind_nginx_kubectl_repo.repository_url}:latest
-
-              # Run the Docker container (expose Nginx on port 80)
-              docker run -d -p 80:80 ${aws_ecr_repository.kind_nginx_kubectl_repo.repository_url}:latest
+              # Authenticate with ECR and pull image
+              $(aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 767828742018.dkr.ecr.eu-central-1.amazonaws.com)
+              docker pull 767828742018.dkr.ecr.eu-central-1.amazonaws.com/your-image:latest
+              docker run -d -p 80:80 767828742018.dkr.ecr.eu-central-1.amazonaws.com/your-image:latest
               EOF
 
 
@@ -82,6 +80,12 @@ resource "aws_instance" "cgi_kind_instance" {
   }
 
 }
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "ec2-instance-profile"
+  role = aws_iam_role.ec2_role.name
+}
+
+
 # Output the instance public IP
 output "instance_public_ip" {
   value = aws_instance.cgi_kind_instance.public_ip

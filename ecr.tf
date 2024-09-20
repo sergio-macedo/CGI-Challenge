@@ -1,6 +1,7 @@
 resource "aws_ecr_repository" "kind_nginx_kubectl_repo" {
-  name = "cgi-ecr-kind"
-  
+  name                 = "cgi-ecr-kind"
+  image_tag_mutability = "IMMUTABLE"
+
 }
 
 resource "null_resource" "login_to_ecr" {
