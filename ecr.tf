@@ -26,16 +26,3 @@ output "ecr_repository_url" {
   value = aws_ecr_repository.kind_nginx_kubectl_repo.repository_url
 }
 
-
-# resource "docker_registry_image" "helloworld" {
-#   name          = docker_image.image.name
-#   keep_remotely = true
-# }
-
-# resource "docker_image" "image" {
-#   name = "${aws_ecr_repository.kind_nginx_kubectl_repo.repository_url}:1.0.0"
-
-#   build {
-#     dockerfile = "Dockerfile"
-#   }
-# }
