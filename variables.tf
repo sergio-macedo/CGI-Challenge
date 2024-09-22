@@ -10,3 +10,63 @@ variable "aws_region" {
   default     = "eu-central-1"
 
 }
+
+
+#vpc module variables
+
+variable "cidr_block" {
+  type        = string
+  description = "CIDR of the vpc"
+  default = "10.0.0.0/16"
+}
+
+variable "project_name" {
+  type        = string
+  description = "Project name to be used to name the resources (Name tag)"
+  default = "CGI-Dev-Challenge"
+}
+
+# variable "tags" {
+#   type        = map(any)
+#   description = "project tags"
+
+# }
+
+variable "azs" {
+  type    = list(string)
+  default = ["eu-central-1a", "eu-central-1b"]  # Update with desired AZs
+}
+
+variable "public_subnet_cidrs" {
+  type    = list(string)
+  default = ["10.0.1.0/24", "10.0.2.0/24"]  # Corresponding CIDRs for the subnets
+}
+
+variable "private_subnet_cidrs" {
+  type    = list(string)
+  default = ["10.0.3.0/24", "10.0.4.0/24"]  # Corresponding CIDRs for the subnets
+}
+
+
+#variables from ecs
+
+
+variable "region" {
+  default = "eu-central-1"
+}
+
+variable "app_name" {
+  default = "CGI-Nginx"
+}
+
+variable "desired_count" {
+  default = 1
+}
+
+variable "cpu" {
+  default = "512"
+}
+
+variable "memory" {
+  default = "1024"
+}

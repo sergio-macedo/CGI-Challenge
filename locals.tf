@@ -1,5 +1,6 @@
 locals {
   tags = {
+    Department = "DevOps"
     Organization = "CGI"
     Project      = "Cloud&DevOps Challenge"
   }
