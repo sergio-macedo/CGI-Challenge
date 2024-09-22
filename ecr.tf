@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "kind_nginx_kubectl_repo" {
-  name                 = "cgi-ecr-kind"
+  name                 = "cgi-ecr-node"
   image_tag_mutability = "IMMUTABLE"
 
 }
@@ -15,8 +15,8 @@ resource "null_resource" "docker_build_and_push" {
 
   provisioner "local-exec" {
     command = <<EOT
-      docker build -t cgi-ecr-kind .
-      docker tag cgi-ecr-kind:latest 767828742018.dkr.ecr.eu-central-1.amazonaws.com/cgi-ecr-kind:latest
+      docker build -t cgi-ecr-node .
+      docker tag cgi-ecr-node:latest 767828742018.dkr.ecr.eu-central-1.amazonaws.com/cgi-ecr-node:latest
       docker push 767828742018.dkr.ecr.eu-central-1.amazonaws.com/cgi-ecr-kind:latest
     EOT
   }
