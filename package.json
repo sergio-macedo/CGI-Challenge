@@ -1,0 +1,14 @@
+{
+    "name": "hello-world-app",
+    "version": "1.0.0",
+    "description": "A simple Hello World app that checks EKS nodes.",
+    "main": "server.js",
+    "dependencies": {
+      "express": "^4.17.1",
+      "child_process": "latest"
+    },
+    "scripts": {
+      "start": "node server.js"
+    }
+  }
+  
