@@ -1,5 +1,5 @@
 resource "aws_security_group" "ecs_sg" {
-  vpc_id =aws_vpc.cgi_vpc.id
+  vpc_id = aws_vpc.cgi_vpc.id
 
   ingress {
     from_port   = 80
@@ -15,7 +15,7 @@ resource "aws_security_group" "ecs_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-      tags = merge(
+  tags = merge(
     local.tags,
     {
       Name = "${var.project_name}-ecs"

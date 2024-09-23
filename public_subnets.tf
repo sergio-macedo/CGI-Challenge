@@ -1,5 +1,5 @@
 resource "aws_subnet" "CGI_challenge_pub_subnet" {
-  count = length(var.azs)
+  count                   = length(var.azs)
   vpc_id                  = aws_vpc.cgi_vpc.id
   cidr_block              = var.public_subnet_cidrs[count.index]
   map_public_ip_on_launch = true
@@ -7,10 +7,10 @@ resource "aws_subnet" "CGI_challenge_pub_subnet" {
   tags = merge(
     local.tags,
     {
-      Name = "${var.project_name}-public ${count.index +1}"
+      Name = "${var.project_name}-public ${count.index + 1}"
     }
   )
-  }
+}
 
 resource "aws_route_table" "cgi_pub_rtb" {
   vpc_id = aws_vpc.cgi_vpc.id
@@ -19,7 +19,7 @@ resource "aws_route_table" "cgi_pub_rtb" {
     gateway_id = aws_internet_gateway.cgi_igw.id
   }
 
-    tags = merge(
+  tags = merge(
     local.tags,
     {
       Name = "${var.project_name}-rtb-public"

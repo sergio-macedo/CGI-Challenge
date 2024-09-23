@@ -7,7 +7,7 @@ resource "aws_vpc" "cgi_vpc" {
     {
       Name = "${var.project_name}-vpc"
     }
-    )
-  }
+  )
+}
 
 
