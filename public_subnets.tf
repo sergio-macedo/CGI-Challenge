@@ -30,7 +30,7 @@ resource "aws_route_table" "cgi_pub_rtb" {
 
 resource "aws_route_table_association" "public_assoc" {
   count          = length(var.azs)
-  subnet_id      = aws_subnet.CGI_challenge_pub_subnet.*.id[count.index]
+  subnet_id      = aws_subnet.CGI_challenge_pub_subnet[count.index].id
   route_table_id = aws_route_table.cgi_pub_rtb.id
 }
 
