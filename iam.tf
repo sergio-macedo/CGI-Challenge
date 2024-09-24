@@ -1,6 +1,5 @@
-# Define the IAM Role for ECS Task Execution
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecsTaskExecutionRole"
+resource "aws_iam_role" "eks_unified_role" {
+  name = "${var.project_name}-eks-unified-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -8,66 +7,14 @@ resource "aws_iam_role" "ecs_task_execution_role" {
       {
         Effect = "Allow",
         Principal = {
-          Service = "ecs-tasks.amazonaws.com"
+          Service = "eks.amazonaws.com" # For the EKS control plane
         },
         Action = "sts:AssumeRole"
-      }
-    ]
-  })
-}
-resource "aws_iam_policy" "ecs_task_execution_policy" {
-  name   = "ecsTaskExecutionPolicy"
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage",
-          "ecr:BatchCheckLayerAvailability"
-        ],
-        Resource = "*"
       },
-      {
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "logs:CreateLogGroup"
-        ],
-        Resource = "*"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "ssm:GetParameters",
-          "ssm:GetParameter"
-        ],
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-
-
-# Attach the necessary policies to the IAM Role
-resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.ecs_task_execution_policy.arn
-}
-
-resource "aws_iam_role" "ecs_task_role" {
-  name = "ecsTaskRole"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
       {
         Effect = "Allow",
         Principal = {
-          Service = "ecs-tasks.amazonaws.com"
+          Service = "ec2.amazonaws.com" # For EC2 nodes
         },
         Action = "sts:AssumeRole"
       }
@@ -75,39 +22,63 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 }
 
+# Attach the necessary policies to the role
 
+# For EKS cluster management
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  role       = aws_iam_role.eks_unified_role.name
+}
 
-resource "aws_iam_policy" "ecr_pull_policy" {
-  name        = "ECSPullFromECRPolicy"
-  description = "Allows ECS tasks to pull images from ECR"
+resource "aws_iam_role_policy_attachment" "eks_vpc_controller_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+  role       = aws_iam_role.eks_unified_role.name
+}
+
+# For EC2 instance nodes (worker nodes)
+resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.eks_unified_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.eks_unified_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "ecr_readonly_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.eks_unified_role.name
+}
+
+# Additional permissions as needed
+resource "aws_iam_policy" "custom_eks_access_policy" {
+  name        = "${var.project_name}-eks-custom-access"
+  description = "Custom EKS access policy"
 
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
+        Effect = "Allow",
         Action = [
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:DescribeRepositories",
-          "ecr:ListImages"
+          "eks:DescribeCluster",
+          "eks:CreateCluster",
+          "eks:DeleteCluster",
+          "eks:UpdateClusterConfig",
+          "ec2:DescribeInstances",
+          "ec2:DescribeTags",
+          "elasticloadbalancing:*",
+          "autoscaling:*",
+          "eks:GetToken"
         ],
-        Effect   = "Allow",
         Resource = "*"
-      },
-      {
-        Effect : "Allow",
-        Action : [
-          "ecr:GetAuthorizationToken"
-        ],
-        Resource : "*"
       }
     ]
   })
 }
 
-# Attach the custom ECR policy to the ECS Task Execution Role
-resource "aws_iam_role_policy_attachment" "ecr_pull_policy_attachment" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.ecr_pull_policy.arn
+resource "aws_iam_role_policy_attachment" "custom_eks_access_policy_attachment" {
+  policy_arn = aws_iam_policy.custom_eks_access_policy.arn
+  role       = aws_iam_role.eks_unified_role.name
 }
