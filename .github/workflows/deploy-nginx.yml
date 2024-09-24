@@ -33,6 +33,6 @@ jobs:
       - name: Configure kubectl
         run: echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
 
-      t
+      
       - name: Deploy Nginx
         run: kubectl apply -f nginx-deployment.yaml
