@@ -48,18 +48,11 @@ resource "aws_security_group" "alb_sg" {
   }
 
   ingress {
-    from_port   = 443
-    to_port     = 443
+    from_port   = 6443
+    to_port     = 6443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-  }
-
-  ingress {
-    from_port = 3000
-    to_port = 3000
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -93,25 +86,25 @@ resource "aws_security_group" "ecs_tasks" {
     security_groups = [aws_security_group.alb_sg.id]
   }
   ingress {
-    from_port = 3000
-    to_port = 3000
-    protocol = "tcp"
+    from_port       = 3000
+    to_port         = 3000
+    protocol        = "tcp"
     security_groups = [aws_security_group.alb_sg.id]
   }
 
   ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
+    from_port       = 6443
+    to_port         = 6443
+    protocol        = "tcp"
     security_groups = [aws_security_group.alb_sg.id]
   }
 
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
     security_groups = [aws_security_group.alb_sg.id]
 
   }
@@ -122,8 +115,25 @@ resource "aws_security_group" "ecs_tasks" {
       Name = "${var.project_name}-ecs-tasks"
     }
   )
+}
 
 
+resource "aws_security_group" "endpoint_sg" {
+  name        = "ecr-endpoint-sg"
+  vpc_id      = aws_vpc.cgi_vpc.id
+  description = "Security group for ECR VPC Endpoints"
 
+  ingress {
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = var.private_subnet_cidrs
+  }
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
