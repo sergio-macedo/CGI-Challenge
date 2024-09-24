@@ -3,18 +3,18 @@ name: Deploy Nginx
 on:
   push:
     branches:
-      - main  # or your desired branch
+      - main 
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code
+      
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up AWS CLI
+      
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -22,17 +22,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Step 3: Set up kubectl
+      
       - name: Set up kubectl
         run: |
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
 
-      # Step 4: Configure kubectl
+     
       - name: Configure kubectl
         run: echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
 
-      # Step 5: Apply the Nginx deployment
+      t
       - name: Deploy Nginx
         run: kubectl apply -f nginx-deployment.yaml
