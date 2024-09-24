@@ -36,7 +36,7 @@ resource "null_resource" "login_to_ecr" {
 resource "null_resource" "docker_build_and_push" {
   depends_on = [null_resource.login_to_ecr]
 
- provisioner "local-exec" {
+  provisioner "local-exec" {
     command = <<EOT
       docker build -t cgi-ecr-node .
       docker tag cgi-ecr-node ${var.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/cgi-ecr-node:latest
