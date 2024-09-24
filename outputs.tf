@@ -1,11 +1,11 @@
-output "vpc" {
-  value = {
-    id         = aws_vpc.cgi_vpc.id
-    arn        = aws_vpc.cgi_vpc.arn
-    cidr_block = aws_vpc.cgi_vpc.cidr_block
-  }
+# output "vpc" {
+#   value = {
+#     id         = aws_vpc.cgi_vpc.id
+#     arn        = aws_vpc.cgi_vpc.arn
+#     cidr_block = aws_vpc.cgi_vpc.cidr_block
+#   }
 
-}
+# }
 
 
 # output "subnets" {
