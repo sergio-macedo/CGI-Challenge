@@ -16,7 +16,7 @@ resource "aws_alb_target_group" "cgi_tg" {
   name        = "cgi-tg"
   port        = 3000
   protocol    = "HTTP"
-  target_type = "ip"
+  target_type = "ip"  #because of fargate.
 
 
   health_check {
@@ -37,9 +37,27 @@ resource "aws_alb_target_group" "cgi_tg" {
   )
 }
 
-resource "aws_alb_listener" "http" {
+resource "aws_alb_listener" "port_3000" {
   load_balancer_arn = aws_alb.fargate_load_balancer.id
   port              = 3000
+  protocol          = "HTTP"
+  default_action {
+    type = "forward"
+    target_group_arn = aws_alb_target_group.cgi_tg.id
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.project_name}-vpc"
+    }
+  )
+
+}
+
+resource "aws_alb_listener" "http" {
+  load_balancer_arn = aws_alb.fargate_load_balancer.id
+  port              = 80
   protocol          = "HTTP"
   default_action {
     type = "forward"
