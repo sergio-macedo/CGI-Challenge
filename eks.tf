@@ -46,5 +46,4 @@ resource "aws_eks_node_group" "example" {
       Name = "${var.project_name}-node-group"
     }
   )
-
 }
