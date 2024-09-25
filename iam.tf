@@ -7,14 +7,14 @@ resource "aws_iam_role" "eks_unified_role" {
       {
         Effect = "Allow",
         Principal = {
-          Service = "eks.amazonaws.com" # For the EKS control plane
+          Service = "eks.amazonaws.com" #control plane
         },
         Action = "sts:AssumeRole"
       },
       {
         Effect = "Allow",
         Principal = {
-          Service = "ec2.amazonaws.com" # For EC2 nodes
+          Service = "ec2.amazonaws.com" # nodes
         },
         Action = "sts:AssumeRole"
       }
@@ -22,9 +22,7 @@ resource "aws_iam_role" "eks_unified_role" {
   })
 }
 
-# Attach the necessary policies to the role
 
-# For EKS cluster management
 resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   role       = aws_iam_role.eks_unified_role.name
@@ -35,7 +33,6 @@ resource "aws_iam_role_policy_attachment" "eks_vpc_controller_policy" {
   role       = aws_iam_role.eks_unified_role.name
 }
 
-# For EC2 instance nodes (worker nodes)
 resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.eks_unified_role.name
@@ -51,7 +48,6 @@ resource "aws_iam_role_policy_attachment" "ecr_readonly_policy" {
   role       = aws_iam_role.eks_unified_role.name
 }
 
-# Additional permissions as needed
 resource "aws_iam_policy" "custom_eks_access_policy" {
   name        = "${var.project_name}-eks-custom-access"
   description = "Custom EKS access policy"

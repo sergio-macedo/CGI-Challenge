@@ -67,25 +67,25 @@ variable "desired_count" {
   default = 1
 }
 
-variable "ecs" {
-  type = object({
-    app_port          = number
-    app_count         = number
-    health_check_path = string
-    fargate_cpu       = string
-    fargate_memory    = string
-    container_name    = string
-  })
-  default = {
-    app_count         = 1
-    health_check_path = "/healthcheck"
-    fargate_cpu       = 256
-    fargate_memory    = 512
-    app_port          = "80"
-    container_name    = "cgi-challenge_container"
-  }
+# variable "ecs" {
+#   type = object({
+#     app_port          = number
+#     app_count         = number
+#     health_check_path = string
+#     fargate_cpu       = string
+#     fargate_memory    = string
+#     container_name    = string
+#   })
+#   default = {
+#     app_count         = 1
+#     health_check_path = "/healthcheck"
+#     fargate_cpu       = 256
+#     fargate_memory    = 512
+#     app_port          = "80"
+#     container_name    = "cgi-challenge_container"
+#   }
 
-}
+# }
 variable "auto_scaling" {
   type = object({
     max_capacity       = number
