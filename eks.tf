@@ -4,7 +4,6 @@ provider "kubernetes" {
   token                  = data.aws_eks_cluster_auth.eks_cluster_auth.token
 }
 
-
 resource "aws_eks_cluster" "example" {
   name     = "example-cluster"
   role_arn = aws_iam_role.eks_unified_role.arn
@@ -15,6 +14,13 @@ resource "aws_eks_cluster" "example" {
   }
 
   depends_on = [aws_iam_role_policy_attachment.eks_policy]
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.project_name}-vpc"
+    }
+  )
+
 }
 resource "aws_iam_role_policy_attachment" "eks_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"

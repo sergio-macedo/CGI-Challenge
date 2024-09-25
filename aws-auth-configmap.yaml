@@ -14,15 +14,3 @@ metadata:
       groups:
         - system:masters
 
-
-# apiVersion: v1
-# kind: ConfigMap
-# metadata:
-#   name: aws-auth
-#   namespace: kube-system
-# data:
-#   mapRoles: |
-#     - rolearn: arn:aws:iam::767828742018:role/eks_role
-#       username: terraform
-#       groups:
-#         - system:masters

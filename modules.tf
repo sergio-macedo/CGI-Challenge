@@ -6,11 +6,6 @@
 #     aws_region = var.aws_region
 
 # }
-# module "ecs" {
-#         source = "./modules/ecs"
-#         project_name = var.project_name
-#         tags = local.tags
 
-# }
 
 
